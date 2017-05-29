@@ -1,9 +1,24 @@
 #include "edge.h"
 #include <stdlib.h>
 
-Edge::Edge(){
+Edge::Edge(int i, int sId, int eId, float w){
+	
+	startId = sId;
+	endId = eId;
+	id = i;
+	weight = w;
 	
 	
-	id = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/100000));//for differentiating which nodes are which, checking by memory locations doesnt work
-	
+}
+
+
+int Edge::getStartId(){
+	return startId;
+}
+int Edge::getEndId(){
+	return endId;
+}
+
+float Edge::getWeight(){
+	return weight;
 }

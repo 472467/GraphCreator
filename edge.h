@@ -10,12 +10,17 @@
 class Edge
 {
 	private:
-		float id;
-		
+		int id;
+		int startId;
+		int endId;
+		float weight;
 	
 	public:
-		Edge();
+		Edge(int, int, int, float);
 	
+		int getStartId();
+		int getEndId();
+		float getWeight();
 };
 
 #endif
