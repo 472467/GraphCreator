@@ -14,7 +14,7 @@ class Vertex
 		int id;
 		char* label;
 		float runningDistance;
-		Vertex** bestPath;
+		int* bestPath;
 	
 	public:
 		Vertex(int, char*);
@@ -24,9 +24,8 @@ class Vertex
 		float getRunningDistance();
 		void setRunningDistance(float);
 		
-		Vertex** getBestPath();
-		void setBestPath(Vertex**);
-	
+		int* getBestPath();
+		void setBestPath(int*);
 };
 
 #endif

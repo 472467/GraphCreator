@@ -147,9 +147,9 @@ void findPath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* l
 			for(int x = 0; x < 40; x++){
 				visitedEdges[x] = -1;
 			}
-			Vertex** bestPath = new Vertex*[20];
+			int* bestPath = new int[20];
 			for(int x = 0; x < 20; x++){
-				bestPath[x] = NULL;
+				bestPath[x] = -1;
 			}
 			source->setBestPath(bestPath);
 			recursivePath(adjTable, vertices, edges, visitedEdges, source, fin);
@@ -162,14 +162,14 @@ void findPath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* l
 				cout << "\nShortest Path: "; 
 				for(int x = 0; x < 20; x++){
 					
-					if((fin->getBestPath()[x])->getID() != -1){
-						cout<< (fin->getBestPath()[x])->getLabel();
+					if((fin->getBestPath()[x]) != -1){
+						cout<< vertices[(fin->getBestPath()[x])]->getLabel();
 					}else{
 						x  = 21;
 					}
 					
 					if(x != 21){
-						if((fin->getBestPath()[x+1])->getID() != -1){
+						if((fin->getBestPath()[x+1]) != -1){
 							cout << " -> ";
 						}
 					}
@@ -180,7 +180,7 @@ void findPath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* l
 			for(int x = 0; x < 20; x++){
 				if(vertices[x]->getID() != -1){
 					vertices[x]->setRunningDistance(0);
-					vertices[x]->setBestPath(NULL);
+					vertices[x]->setBestPath(bestPath);
 				}else{
 					x = 21;
 				}
@@ -229,11 +229,11 @@ void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, in
 		
 		if(outgoingEdges[0] == NULL){
 			if(strcasecmp(current->getLabel(), fin->getLabel()) == 0){
-				Vertex** bestP = current->getBestPath();
+				int* bestP = current->getBestPath();
 				for(int z = 0; z < 20; z++){
-					if(bestP[z] != NULL){
+					if(bestP[z] != -1){
 					}else{
-						bestP[z] = current;
+						bestP[z] = current->getID();
 						z = 21;
 					}
 				}
@@ -262,12 +262,12 @@ void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, in
 				if(!visited){
 					//cout << "test";
 					if(outgoingVertices[x]->getRunningDistance() == 0){
-						Vertex** bestP = current->getBestPath();
+						int* bestP = current->getBestPath();
 
 						for(int z = 0; z < 20; z++){
-							if(bestP[z] != NULL){
+							if(bestP[z] != -1){
 							}else{
-								bestP[z] = current;
+								bestP[z] = current->getID();
 								z = 21;
 							}
 						}
@@ -278,11 +278,13 @@ void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, in
 					}else{
 						float newDistance = current->getRunningDistance() + outgoingEdges[x]->getWeight();
 						if(newDistance < outgoingVertices[x]->getRunningDistance()){
-							Vertex** bestP = current->getBestPath();
+							int* bestP = current->getBestPath();
 							for(int z = 0; z < 20; z++){
-								if(bestP[z] != NULL){
+								//cout << bestP<< endl;
+								
+								if(bestP[z] != -1){
 								}else{
-									bestP[z] = current;
+									bestP[z] = current->getID();
 									z = 21;
 								}
 							}

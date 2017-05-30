@@ -7,7 +7,10 @@ Vertex::Vertex(int i, char* l){
 	strcpy(label, l);
 	id = i;
 	runningDistance = 0;
-	bestPath = NULL;
+	bestPath = new int[20];
+	for(int x = 0; x< 20; x++){
+		bestPath[x] = -1;
+	}
 	
 }
 
@@ -33,19 +36,16 @@ void Vertex::setRunningDistance(float d){
 	runningDistance = d;
 }
 
-Vertex** Vertex::getBestPath(){
+int* Vertex::getBestPath(){
 	return bestPath;
 }
 
-void Vertex::setBestPath(Vertex** bestP){
-	bestPath = bestP;
-}
-/*
-void Vertex::cloneBestPath(Vertex* amigo){
-	if(amigo->getBestPath() != NULL){
-		for(int x = 0; x< 20; x++){
-			
-		}
+void Vertex::setBestPath(int* bestP){
+	for(int x= 0; x< 20; x++){
+		bestPath[x] = bestP[x];
 	}
 }
-*/
+
+
+
+
