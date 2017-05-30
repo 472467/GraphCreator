@@ -5,6 +5,7 @@
 #include <string.h>
 #include <iostream>
 #include <vector>
+//#include "path.h"
 
 
 class Vertex
@@ -13,7 +14,7 @@ class Vertex
 		int id;
 		char* label;
 		float runningDistance;
-		
+		Vertex** bestPath;
 	
 	public:
 		Vertex(int, char*);
@@ -22,6 +23,9 @@ class Vertex
 		char* getLabel();
 		float getRunningDistance();
 		void setRunningDistance(float);
+		
+		Vertex** getBestPath();
+		void setBestPath(Vertex**);
 	
 };
 

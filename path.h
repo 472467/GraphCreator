@@ -17,7 +17,7 @@ class Path
 		Path(Vertex**);
 		
 		Vertex** getPath();
-		float getTotalDistance();
+		//float getTotalDistance();
 		
 };
 

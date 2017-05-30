@@ -22,6 +22,7 @@ void addEdge(int**&, Vertex**&, vector<Edge*>&, char*, char*, char*);
 void removeEdge(int**&, Vertex**&, vector<Edge*>&, char*, char*);
 void findPath(int**&, Vertex**&, vector<Edge*>&, char*, char*);
 void recursivePath(int**&, Vertex**&, vector<Edge*>&, int*&, Vertex*, Vertex*);
+float getRunningDistance(Vertex**);
 
 
 
@@ -40,6 +41,18 @@ int main(){
 	}
 	cout << "Avoid using the same label multiple times, it will likely cause errors.\n";
 	cout << "Typed commands will give further instructions.\n";
+	
+	addVertex(adjTable, vertices, "a");
+	addVertex(adjTable, vertices, "b");
+	addVertex(adjTable, vertices, "c");
+	addVertex(adjTable, vertices, "d");
+	addVertex(adjTable, vertices, "e");
+	
+	addEdge(adjTable, vertices, edges, "a", "b", "7");
+	addEdge(adjTable, vertices, edges, "a", "c", "4");
+	addEdge(adjTable, vertices, edges, "c", "d", "2");
+	addEdge(adjTable, vertices, edges, "b", "d", "3");
+	addEdge(adjTable, vertices, edges, "d", "e", "2.3");
 	
 	//TreeNode* head = NULL;
 	
@@ -131,13 +144,48 @@ void findPath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* l
 		if(edges.size() == 0 || true){
 			//int*&, Vertex*, Vertex*
 			int* visitedEdges = new int[40];
+			for(int x = 0; x < 40; x++){
+				visitedEdges[x] = -1;
+			}
+			Vertex** bestPath = new Vertex*[20];
+			for(int x = 0; x < 20; x++){
+				bestPath[x] = NULL;
+			}
+			source->setBestPath(bestPath);
 			recursivePath(adjTable, vertices, edges, visitedEdges, source, fin);
 			
-			if(fin->getRunningDistance() == -1){
+			
+			
+			if(fin->getRunningDistance() == 0){
 				cout << "\nNo path to vertex!\n";
 			}else{
-				cout << "\nShortest Path: " << fin->getRunningDistance() << endl;
+				cout << "\nShortest Path: "; 
+				for(int x = 0; x < 20; x++){
+					
+					if((fin->getBestPath()[x])->getID() != -1){
+						cout<< (fin->getBestPath()[x])->getLabel();
+					}else{
+						x  = 21;
+					}
+					
+					if(x != 21){
+						if((fin->getBestPath()[x+1])->getID() != -1){
+							cout << " -> ";
+						}
+					}
+				}
+				cout <<endl<< "Total Distance: "<< fin->getRunningDistance() << endl;	
 			}
+			
+			for(int x = 0; x < 20; x++){
+				if(vertices[x]->getID() != -1){
+					vertices[x]->setRunningDistance(0);
+					vertices[x]->setBestPath(NULL);
+				}else{
+					x = 21;
+				}
+			}
+			
 		}else{
 			cout << "Error! No edges\n ";
 		}
@@ -158,7 +206,7 @@ void findPath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* l
 }
 
 void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, int*& visitedEdges, Vertex* current, Vertex* fin){
-	
+	//cout << "test";
 	int currentVisited = 0;
 	
 	if(true){
@@ -180,7 +228,23 @@ void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, in
 		}
 		
 		if(outgoingEdges[0] == NULL){
+			if(strcasecmp(current->getLabel(), fin->getLabel()) == 0){
+				Vertex** bestP = current->getBestPath();
+				for(int z = 0; z < 20; z++){
+					if(bestP[z] != NULL){
+					}else{
+						bestP[z] = current;
+						z = 21;
+					}
+				}
+				
+				current->setBestPath(bestP);
+			}
+			
+			
+			//cout << "test2";
 		}else{
+			//cout << currentEdgeNum;
 			for(int x = 0; x < currentEdgeNum; x++){
 				bool visited = false;
 				int endVisited = -1;
@@ -196,17 +260,44 @@ void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, in
 					}
 				}
 				if(!visited){
-					if(outgoingVertices[x]->getRunningDistance() == -1){
+					//cout << "test";
+					if(outgoingVertices[x]->getRunningDistance() == 0){
+						Vertex** bestP = current->getBestPath();
+
+						for(int z = 0; z < 20; z++){
+							if(bestP[z] != NULL){
+							}else{
+								bestP[z] = current;
+								z = 21;
+							}
+						}
+						
+						outgoingVertices[x]->setBestPath(bestP);
 						outgoingVertices[x]->setRunningDistance(current->getRunningDistance() + outgoingEdges[x]->getWeight());
+						
 					}else{
 						float newDistance = current->getRunningDistance() + outgoingEdges[x]->getWeight();
 						if(newDistance < outgoingVertices[x]->getRunningDistance()){
+							Vertex** bestP = current->getBestPath();
+							for(int z = 0; z < 20; z++){
+								if(bestP[z] != NULL){
+								}else{
+									bestP[z] = current;
+									z = 21;
+								}
+							}
+							
+							outgoingVertices[x]->setBestPath(bestP);
 							outgoingVertices[x]->setRunningDistance(current->getRunningDistance() + newDistance);
 						}
+						
+						
 					}
+					
 					visitedEdges[endVisited] = outgoingEdges[x]->getID();
 					
 					for(int w = 0; w < currentEdgeNum; w++){
+						//cout << "test";
 						current = outgoingVertices[w];
 						recursivePath(adjTable, vertices, edges, visitedEdges, current, fin);
 					}
@@ -433,6 +524,38 @@ void removeVertex(int**& adjTable, Vertex**& vertices, char* label){
 	}
 }
 
+float getRunningDistance(Vertex** vertices){
+	for(int x = 0; x < 19; x++){
+		if(vertices[x+1]->getID() != -1){
+			return vertices[x+1]->getRunningDistance();
+		}else{
+			if(x == 18){
+				if(vertices[x+1]->getID() != -1){
+					return vertices[x+1]->getRunningDistance();
+				}
+			}
+			x = 21;
+		}
+	}
+	return -1;
+}
+
+Vertex* getLastVertex(Vertex** vertices){
+	for(int x = 0; x < 19; x++){
+		if(vertices[x+1]->getID() != -1){
+			return vertices[x+1];
+		}else{
+			if(x == 18){
+				if(vertices[x+1]->getID() != -1){
+					return vertices[x+1];
+				}
+			}
+			x = 21;
+		}
+	}
+	return NULL;
+}
+
 void printShit(int** adjTable, Vertex** vertices, vector<Edge*>& edges){
 	if(adjTable[0][0] == -1){
 		cout << "Nothing to print!\n";
@@ -455,9 +578,10 @@ void printShit(int** adjTable, Vertex** vertices, vector<Edge*>& edges){
 		cout << "\n\nadjTable: \n";
 	
 		for(int x = 0; x < 20; x++){//print Adjacency table
-			for(int y = 0; y < 20; y++){     
-				cout << adjTable[x][y] << " ";
-				
+			for(int y = 0; y < 20; y++){ 
+				if(adjTable[x][y] != -1){
+					cout << adjTable[x][y] << " ";
+				}
 			}
 			if(adjTable[x][0] == -1){
 				x = 21;
