@@ -1,5 +1,6 @@
 #include "vertex.h"
 #include "edge.h"
+//#include "path.h"
 
 #include <iostream>
 #include <fstream> 
@@ -19,6 +20,8 @@ void addVertex(int**&, Vertex**&, char*);
 void removeVertex(int**&, Vertex**&, char*);
 void addEdge(int**&, Vertex**&, vector<Edge*>&, char*, char*, char*);
 void removeEdge(int**&, Vertex**&, vector<Edge*>&, char*, char*);
+void findPath(int**&, Vertex**&, vector<Edge*>&, char*, char*);
+void recursivePath(int**&, Vertex**&, vector<Edge*>&, int*&, Vertex*, Vertex*);
 
 
 
@@ -35,7 +38,7 @@ int main(){
 			adjTable[x][y] = -1;
 		}
 	}
-	
+	cout << "Avoid using the same label multiple times, it will likely cause errors.\n";
 	cout << "Typed commands will give further instructions.\n";
 	
 	//TreeNode* head = NULL;
@@ -53,7 +56,7 @@ int main(){
 void translateInput(char* input, int**& adjTable, Vertex**& vertices, vector<Edge*>& edges){//converts input into commands
 	char* input2 = new char[40];
 	if(strcasecmp(input, "AV") == 0 || strcasecmp(input, "Add-Vertex") == 0){
-		cout << "Enter label for Vertex:\n";
+		cout << "Enter label for vertex to add:\n";
 		cin.getline(input2, 40);
 		addVertex(adjTable, vertices, input2);
 		
@@ -84,7 +87,13 @@ void translateInput(char* input, int**& adjTable, Vertex**& vertices, vector<Edg
 		removeEdge(adjTable, vertices, edges, input2, input3);
 		
 	}else if(strcasecmp(input, "FP") == 0 || strcasecmp(input, "Find-Path") == 0){
+		char* input3 = new char[40];
+		cout << "Enter start label of vertex to find:";
+		cin.getline(input2, 40);
+		cout << "\nEnter end label of vertex to find:";
+		cin.getline(input3, 40);
 		
+		findPath(adjTable, vertices, edges, input2, input3);
 		
 	}else if(strcasecmp(input, "P") == 0 || strcasecmp(input, "Print") == 0){
 		printShit(adjTable, vertices, edges);
@@ -95,6 +104,117 @@ void translateInput(char* input, int**& adjTable, Vertex**& vertices, vector<Edg
 	}else{
 		cout << "\nCommand unrecognized.\n";
 	}
+}
+
+void findPath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* labelStart, char* labelEnd){
+	Vertex* source = NULL;
+	Vertex* fin = NULL;
+	char** visitedVertices = new char*[20];
+	char** bestPath = new char*[edges.size()];
+	for(int x = 0; x< 20; x++){
+		visitedVertices[x] = "!";
+	}
+	
+	for(int x = 0; x < 20; x++){
+		if(vertices[x]->getID() != -1){
+			if(strcasecmp(vertices[x]->getLabel(), labelStart) == 0){
+				source = vertices[x];
+			}else if(strcasecmp(vertices[x]->getLabel(), labelEnd) == 0){
+				fin = vertices[x];
+			}
+		}else{
+			x = 21;
+		}
+	}
+	
+	if(source != NULL && fin != NULL){
+		if(edges.size() == 0 || true){
+			//int*&, Vertex*, Vertex*
+			int* visitedEdges = new int[40];
+			recursivePath(adjTable, vertices, edges, visitedEdges, source, fin);
+			
+			if(fin->getRunningDistance() == -1){
+				cout << "\nNo path to vertex!\n";
+			}else{
+				cout << "\nShortest Path: " << fin->getRunningDistance() << endl;
+			}
+		}else{
+			cout << "Error! No edges\n ";
+		}
+		
+		
+	}else{
+		cout << "Error! ";
+		if(source  == NULL){
+			cout << "Source not found ";
+		}
+		
+		if(fin == NULL){
+			cout << "End not found or same label name as source";
+		}
+		cout<< endl;
+	}
+	
+}
+
+void recursivePath(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, int*& visitedEdges, Vertex* current, Vertex* fin){
+	
+	int currentVisited = 0;
+	
+	if(true){
+		Edge** outgoingEdges = new Edge*[20];
+		Vertex** outgoingVertices = new Vertex*[20];
+		for(int x  = 0; x < 20; x++){
+			outgoingEdges[x] = NULL;
+			outgoingVertices[x] = new Vertex();
+		}
+		int currentEdgeNum = 0;
+		for(vector<Edge*>::iterator it = edges.begin(); it != edges.end(); ++it){
+			if(vertices[(*it)->getStartId()]->getLabel() == current->getLabel()){
+				outgoingEdges[currentEdgeNum] = (*it);
+				for(int x= 0; x< 20; x++){
+					outgoingVertices[currentEdgeNum] = vertices[outgoingEdges[currentEdgeNum]->getEndId()];
+				}
+				currentEdgeNum++;
+			}
+		}
+		
+		if(outgoingEdges[0] == NULL){
+		}else{
+			for(int x = 0; x < currentEdgeNum; x++){
+				bool visited = false;
+				int endVisited = -1;
+				
+				for(int z = 0; z < 40; z++){
+					if(visitedEdges[z] == -1){
+						endVisited = z;
+						z = 41;
+					}else{
+						if(outgoingEdges[x]->getID() == visitedEdges[z]){
+							visited = true;
+						}
+					}
+				}
+				if(!visited){
+					if(outgoingVertices[x]->getRunningDistance() == -1){
+						outgoingVertices[x]->setRunningDistance(current->getRunningDistance() + outgoingEdges[x]->getWeight());
+					}else{
+						float newDistance = current->getRunningDistance() + outgoingEdges[x]->getWeight();
+						if(newDistance < outgoingVertices[x]->getRunningDistance()){
+							outgoingVertices[x]->setRunningDistance(current->getRunningDistance() + newDistance);
+						}
+					}
+					visitedEdges[endVisited] = outgoingEdges[x]->getID();
+					
+					for(int w = 0; w < currentEdgeNum; w++){
+						current = outgoingVertices[w];
+						recursivePath(adjTable, vertices, edges, visitedEdges, current, fin);
+					}
+				}
+			}
+		}
+	}
+	
 }
 
 void addEdge(int**& adjTable, Vertex**& vertices, vector<Edge*>& edges, char* labelStart, char* labelEnd, char* weight){

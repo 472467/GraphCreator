@@ -12,6 +12,7 @@ class Vertex
 	private:
 		int id;
 		char* label;
+		float runningDistance;
 		
 	
 	public:
@@ -19,6 +20,8 @@ class Vertex
 		Vertex();
 		int getID();
 		char* getLabel();
+		float getRunningDistance();
+		void setRunningDistance(float);
 	
 };
 

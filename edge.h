@@ -14,6 +14,7 @@ class Edge
 		int startId;
 		int endId;
 		float weight;
+		float runningDistance;
 	
 	public:
 		Edge(int, int, int, float);
@@ -21,6 +22,9 @@ class Edge
 		int getStartId();
 		int getEndId();
 		float getWeight();
+		float getCurrentDistance();
+		void setCurrentDistance(float);
+		int getID();
 };
 
 #endif
